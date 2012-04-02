@@ -1,28 +1,27 @@
 #!/usr/bin/env python
 
-from PIL import Image
+from PIL import Image, ImageChops
 
 
-ORIG = './books-edited.jpg'
+#ORIG = './books-edited.jpg'
+ORIG = './lottery.jpg'
 TEMP = 'temp.jpg'
-SCALE = 15
+SCALE = 10
 
 
 def ELA():
     original = Image.open(ORIG)
-    original.save(TEMP, quality=70)
+    original.save(TEMP, quality=90)
     temporary = Image.open(TEMP)
 
-    WIDTH, HEIGHT = original.size
-    i1 = original.load()
-    i2 = temporary.load()
+    diff = ImageChops.difference(original, temporary)
+    d = diff.load()
+    WIDTH, HEIGHT = diff.size
+    for x in range(WIDTH):
+        for y in range(HEIGHT):
+            d[x, y] = tuple(k * SCALE for k in d[x, y])
 
-    for x in range(0, WIDTH):
-        for y in range(0, HEIGHT):
-            r, g, b = [abs(color[0] - color[1]) * SCALE for color in zip(i1[x, y], i2[x, y])]
-            i2[x, y] = (r, g, b)
-
-    temporary.show()
+    diff.show()
 
 if __name__ == '__main__':
     ELA()
